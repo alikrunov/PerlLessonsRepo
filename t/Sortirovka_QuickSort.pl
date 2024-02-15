@@ -2,37 +2,66 @@
 use strict;
 use warnings;
 
-use Scalar::Util qw(looks_like_number);
-
 sub binarySearch(\@) {
     my($array) = @_;
     print("Введите цифру из массива: \n");
-    chomp(my $target = <STDIN>);
-    if (looks_like_number($target)) {
-        foreach my $array (@$array) {
-            print($array);
-        }
+    chomp(my $input = <STDIN>);
+    my $target = _inputCheck(int($input));
+    if ($target) {
+        my $result = _bSearch($array, $target);
+        print("Индекс в массиве: $result \n")
     } else {
-        print("it's not a number!")
+        print('Введено не число');
     }
 
+}
+
+sub _inputCheck {
+    my ($target) = @_;
+    if (length(do { no warnings "numeric"; $target & "" })){
+        return($target);
+    } else {
+        return(0);
+    }
+}
+
+sub _bSearch() {
+    my($array, $target) = @_;
+    my $left = 0;
+    my $right = @$array - 1;
+
+    while($left <= $right) {
+        my $mid = int(($left + $right) / 2);
+
+        if ($target > @$array[$mid]) {
+
+            $left = $mid + 1;
+        }
+        if ($target < @$array[$mid]) {
+            $right = $mid - 1;
+        }
+        if ($target == @$array[$mid]) {
+            return $mid;
+        }
+    }
+    return -1;
 }
 
 sub quickSort (\@) {
-    startSort($_[0], 0, $#{$_[0]})
+    _startSort($_[0], 0, $#{$_[0]})
 }
 
-sub startSort() {
+sub _startSort() {
     my($array, $left, $right) = @_;
         if ($left < $right) {
-        my $q = partition($array, $left, $right);
-            startSort($array, $left, $q - 1);
-            startSort($array, $q + 1, $right);
+        my $q = _partition($array, $left, $right);
+            _startSort($array, $left, $q - 1);
+            _startSort($array, $q + 1, $right);
     }
 
 }
 
-sub partition() {
+sub _partition() {
     my ($array, $left, $right) = @_;
     my $x = @$array[$right];
 
