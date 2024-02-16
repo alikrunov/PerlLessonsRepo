@@ -6,7 +6,7 @@ sub binarySearch(\@) {
     my($array) = @_;
     print("Введите цифру из массива: \n");
     chomp(my $input = <STDIN>);
-    my $target = _inputCheck(int($input));
+    my $target = _inputCheck($input);
     if ($target) {
         my $result = _bSearch($array, $target);
         print("Индекс в массиве: $result \n")
@@ -18,6 +18,7 @@ sub binarySearch(\@) {
 
 sub _inputCheck {
     my ($target) = @_;
+    $target = $target + 0;
     if (length(do { no warnings "numeric"; $target & "" })){
         return($target);
     } else {
