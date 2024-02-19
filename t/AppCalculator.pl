@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
-use warnings;
+#!use warnings;
+
 
 system('cls');
 
@@ -9,12 +10,13 @@ my $result = 0;
 my @stack;
 
 @stack = _input();
+_proccess(@stack);
 
 sub _proccess {
     my $result = 0;
     my ($stack) = @_;
     while(@$stack > 0) {
-
+        print($#stack);
     }
 
 }
@@ -32,16 +34,47 @@ sub _findPriority {
 
 sub _input {
     my @stack;
-    my $input;
-    while($input eq '=') {
+    my $input = 0;
+    my $last = 0;
+    my $isSymbol = 0;
+    while($input ne '=') {
         chomp($input = <STDIN>);
-        push(@stack, $input);
+        $isSymbol = _checkNumber($input);
+        if ($isSymbol == 0) {
+            $isSymbol = _checkOperand($input);
+        }
+
+        if ($isSymbol == $last) {
+            pop(@stack);
+            push(@stack, $input);
+            $last = $isSymbol;
+        } else {
+            push(@stack, $input);
+            $last = $input;
+        }
+
     }
     return @stack;
 }
 
+sub _checkNumber {
+    my ($symbol) = @_;
+    $symbol = $symbol + 0;
+    if (length(do { no warnings "numeric"; $symbol & "" })){
+        return(1);
+    } else {
+        return(0);
+    }
+}
 
-
+sub _checkOperand {
+    my($symbol) = @_;
+    if ($symbol eq '+') {return 2;}
+    if ($symbol eq '-') {return 2;}
+    if ($symbol eq '*') {return 2;}
+    if ($symbol eq '/') {return 2;}
+    return 0;
+}
 
 sub _calculate {
     my $result = 0;
