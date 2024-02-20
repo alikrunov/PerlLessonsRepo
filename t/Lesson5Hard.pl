@@ -4,6 +4,8 @@ use warnings;
 
 my $conf_path = 'C:\Users\EVGENIA\lessons\PerlLessons\conf.ini';
 
+my @bad_words = ('four', 'five');
+
 print("Введите имя файла \n");
 chomp(my $filename = <STDIN>);
 
@@ -11,11 +13,13 @@ my @array = _read_file($filename);
 
 print($#array + 1 . "\n");
 
-my %hash = hash_word(@array);
+my %hash = _hash_word(@array);
 
-print_words(%hash);
+_print_words(%hash);
 
-sub print_words {
+_find_bad_words(@bad_words, @array);
+
+sub _print_words {
     my($hash) = @_;
 
     foreach my $name (reverse sort { $hash{$a} <=> $hash{$b} } keys %hash) {
@@ -25,7 +29,7 @@ sub print_words {
     }
 }
 
-sub hash_word {
+sub _hash_word {
     my($array) = @_;
 
     my %hash;
@@ -59,3 +63,18 @@ sub _read_file {
 
     return @array;
 }
+
+sub _find_bad_words {
+    my($bad_words, $array) = @_;
+    my @find_array;
+
+    foreach my $word (@array) {
+        foreach my $bad_word (@bad_words) {
+            if ($word eq $ bad_word) {
+                print("Use bad word $word \n");
+                push(@find_array, $word);
+            }
+        }
+    }
+}
+
