@@ -4,38 +4,102 @@ use warnings;
 use lib "C:/Users/EVGENIA/lessons/PerlLessons/t";
 use tools;
 
-print("Выберите действие \n");
-chomp(my $action = <STDIN>);
+while () {
+    print("Выберите действие \n");
+    chomp(my $action = <STDIN>);
 
-if ($action ne 'reg' && $action ne 'log' && $action ne 'del' && $action ne 'chp') {
-    print('Неверное действие');
+    my %conf_hash = tools::read_conf($tools::conf_path);
+
+    if ($action eq 'log') {
+        _action_log(%conf_hash);
+    }
+
+    if ($action eq 'reg') {
+        _action_reg(%conf_hash);
+    }
+
+    if ($action eq 'del') {
+        _action_del(%conf_hash);
+    }
+
+    if ($action eq 'chp') {
+        _action_chp(%conf_hash);
+    }
+
+    if ($action eq 'exit') {
+        exit;
+    }
+    system('cls');
+    print("
+######################################################
+#back_end.pl usage
+#reg - registration new user in system;
+#log - login in system
+#del - remove user from system
+#chp - change user password
+#exit - exit
+######################################################
+");
+}
+
+sub _action_log {
+    my (%conf_hash) = @_;
+    print("Введите логин \n");
+    chomp(my $user_name = <STDIN>);
+
+    print("Введите пароль \n");
+    chomp(my $user_passwd = <STDIN>);
+
+    tools::login($user_name, $user_passwd, %conf_hash);
     exit;
 }
 
-my %conf_hash = tools::read_conf($tools::conf_path);
+sub _action_reg {
+    my (%users_prms) = @_;
+    print("Введите имя пользователя \n");
+    chomp(my $user_name = <STDIN>);
 
-if ($action eq 'log') {
-    tools::login(%conf_hash);
+    print("Введите пароль \n");
+    chomp(my $user_pass = <STDIN>);
+
+    if (!tools::reg_user($user_name, $user_pass, %users_prms)) {
+        $users_prms{$user_name} = $user_pass;
+        tools::rewrite_config($tools::conf_path, %users_prms);
+        print("Пользователь $user_name создан \n");
+    }
+    exit;
 }
 
-if ($action eq 'reg') {
-    my %new_conf = tools::reg_user(%conf_hash);
-    tools::rewrite_config(%new_conf);
+sub _action_del {
+    my (%users_prms) = @_;
+    print("Введите логин \n");
+    chomp(my $user_name = <STDIN>);
+
+    print("Введите пароль \n");
+    chomp(my $user_passwd = <STDIN>);
+    if (!tools::del_user($user_name, $user_passwd, %users_prms)) {
+        delete($users_prms{$user_name});
+        tools::rewrite_config($tools::conf_path, %users_prms);
+        print("Пользователь $user_name удалён");
+    }
+    exit;
 }
 
-if ($action eq 'del') {
-    my %new_conf = tools::del_user(%conf_hash);
-    tools::rewrite_config(%new_conf);
+sub _action_chp {
+    my (%users_prms) = @_;
+    print("Введите логин \n");
+    chomp(my $user_name = <STDIN>);
+
+    print("Введите пароль \n");
+    chomp(my $user_passwd = <STDIN>);
+
+    print("Введите новый пароль \n");
+    chomp(my $new_pass = <STDIN>);
+
+    if (!tools::chp_user($user_name, $user_passwd, $new_pass, %users_prms)) {
+        $users_prms{$user_name} = $new_pass;
+        tools::rewrite_config($tools::conf_path, %users_prms);
+        print("Пароль успешно изменён \n");
+    }
+    exit;
 }
-
-if ($action eq 'chp') {
-    my %new_conf = tools::chp_user(%conf_hash);
-    tools::rewrite_config(%new_conf);
-}
-
-
-
-
-
-
-
